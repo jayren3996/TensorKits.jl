@@ -16,7 +16,7 @@ function gate!(
     tlmul!(λl, ΓA)
     Γ = tcmul(mat, tgroup(ΓA, ΓB))
     ΓA2, λc, ΓB2 = tsvd(Γ, α, d1, d2, β, bound=bound, cutoff=cutoff, renormalize=true)
-    trmul!(ΓA2, S)
+    trmul!(ΓA2, λc)
     tlmul!(1.0 ./ λl, ΓA2)
     ΓA2, λc, ΓB2
 end
