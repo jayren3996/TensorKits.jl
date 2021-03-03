@@ -1,6 +1,7 @@
 module TensorKits
 
 using LinearAlgebra
+using SparseArrays
 using TensorOperations
 
 include("Operations.jl")
