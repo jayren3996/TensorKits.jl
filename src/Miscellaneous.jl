@@ -37,7 +37,7 @@ entropy(S::AbstractVector; cutoff::Real=1e-14) = -sum(i*log(i) for i in S if i >
 export inner_product
 function inner_product(T1::Array, T2::Array; itr::Integer=100)
     α, β = size(T1, 3), size(T2, 3)
-    K = Kraus(T1, T2, :r)
+    K = Kraus(T1, conj(T2), :r)
     ρ = rand(ComplexF64, α, β)
     ρ2 = power_iteration(K, ρ, itr, method=:c)
     mul!(ρ, K, ρ2)
