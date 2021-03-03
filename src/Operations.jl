@@ -61,7 +61,7 @@ function tgroup(
     d1, d2 = size(ΓA, 2), size(ΓB, 2)
     ΓA_r = reshape(ΓA, α * d1, :)
     ΓB_r = reshape(ΓB, :, d2 * β)
-    ΓA_r * ΓB_r
+    reshape(ΓA_r * ΓB_r, α, d1 * d2, β)
 end
 #---------------------------------------------------------------------------------------------------
 function tgroup!(

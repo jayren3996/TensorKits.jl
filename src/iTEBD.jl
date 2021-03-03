@@ -27,8 +27,8 @@ function itebd2!(
     mat::AbstractMatrix,
     ΓA::AbstractArray{<:Number, 3},
     ΓB::AbstractArray{<:Number, 3},
-    λl::AbstractVector{<:Real},
-    bound::Integer=100;
+    λl::AbstractVector{<:Real};
+    bound::Integer=100,
     cutoff::Real=1e-14
 )
     d1, d2 = size(ΓA, 2), size(ΓB, 2)
@@ -44,8 +44,8 @@ function itebd3!(
     mat::AbstractMatrix,
     ΓAB1::AbstractArray{<:Number, 3},
     ΓC1::AbstractArray{<:Number, 3},
-    λl::AbstractVector{<:Real},
-    bound::Integer=100;
+    λl::AbstractVector{<:Real};
+    bound::Integer=100,
     cutoff::Real=1e-14
 )
     d1, d2, d3 = size(ΓA, 2), size(ΓB, 2),  size(ΓC, 2)
