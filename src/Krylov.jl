@@ -2,13 +2,13 @@
 # Kraus operator
 #---------------------------------------------------------------------------------------------------
 import LinearAlgebra: mul!
-import base: *, eltype
+import Base: *, eltype
 struct Kraus{TL, TU}
     KL::Array{TL, 3}
     KU::Array{TU, 3}
     dir::Symbol
 end
-eltype(::Kraus{TL, TU}) = promote_type(TL, TU)
+eltype(::Kraus{TL, TU}) where TL where TU = promote_type(TL, TU)
 #---------------------------------------------------------------------------------------------------
 function mul!(ρ::AbstractMatrix, k::Kraus, ρ0::AbstractMatrix)
     KL, KU, dir = k.KL, k.KU, k.dir
@@ -69,10 +69,11 @@ function steady_mat(
     itr::Integer;
     dir::Symbol=:r
 )
-    Kc = conj(C)
+    α = size(K, 3)
+    Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = Array{eltype(K)}(I(α))
-    power_iteration(K, ρ, itr) |> Hermitian
+    power_iteration(kraus, ρ, itr) |> Hermitian
 end
 #---------------------------------------------------------------------------------------------------
 # Random fixed-point matrix.
@@ -81,8 +82,9 @@ function rand_fixed_mat(
     itr::Integer;
     dir::Symbol=:r
 )
-    Kc = conj(C)
+    α = size(K, 3)
+    Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = rand(ComplexF64, α, α) |> Hermitian |> Array
-    power_iteration(K, ρ, itr) |> Hermitian
+    power_iteration(kraus, ρ, itr) |> Hermitian
 end

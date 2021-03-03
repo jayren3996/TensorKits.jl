@@ -45,6 +45,7 @@ end
 # 3. Is NOT guaranteed that the outputs are non-degenerate.
 # 4. The algorithm is UNSTABLE if the transfer matrix has huge condition number.
 #---------------------------------------------------------------------------------------------------
+export right_canonical
 function right_canonical(
     Γ::AbstractArray{<:Number, 3};
     itr::Integer=100,
@@ -102,6 +103,7 @@ end
 # 1. All-at-once method.
 # 2. Return multiple non-degenerate right-canonical form.
 #---------------------------------------------------------------------------------------------------
+export block_canonical
 function block_canonical(
     Γ::AbstractArray{<:Number, 3};
     itr::Integer=100,
@@ -124,6 +126,7 @@ end
 # 1. Given a right canonical form, return a Schmidt canonical form.
 # 2. This algorithm assume there is no degeneracy.
 #---------------------------------------------------------------------------------------------------
+export schmidt_canonical
 function schmidt_canonical(
     Γ::AbstractArray{<:Number,3};
     itr::Integer=100,
