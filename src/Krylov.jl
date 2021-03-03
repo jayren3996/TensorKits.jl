@@ -22,7 +22,7 @@ function mul!(ρ::AbstractMatrix, k::Kraus, ρ0::AbstractMatrix)
 end
 #---------------------------------------------------------------------------------------------------
 function *(k::Kraus, ρ0::AbstractMatrix)
-    ctype = promote_type(eltype.((k, ρ0)))
+    ctype = promote_type(eltype.((k, ρ0))...)
     ρ = Matrix{ctype}(undef, size(ρ0))
     mul!(ρ, K, ρ0)
 end

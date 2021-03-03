@@ -41,7 +41,7 @@ function inner_product(T1::Array, T2::Array; itr::Integer=100)
     ρ = rand(ComplexF64, α, β)
     ρ2 = power_iteration(K, ρ, itr, method=:c)
     mul!(ρ, K, ρ2)
-    dot(vec(ρ2), vec(ρ))
+    dot(vec(ρ2), vec(ρ)) |> abs
 end
 
 inner_product(T::Array; itr::Integer=100) = inner_product(T, T, itr=itr)
