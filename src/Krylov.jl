@@ -35,6 +35,7 @@ function *(k::Kraus, ρ0::AbstractVecOrMat)
     ctype = promote_type(eltype.((k, ρ0))...)
     ρ = Array{ctype}(undef, size(ρ0))
     mul!(ρ, k, ρ0)
+    ρ
 end
 
 #---------------------------------------------------------------------------------------------------
