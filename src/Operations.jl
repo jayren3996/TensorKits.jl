@@ -114,7 +114,7 @@ function tsvd(
     d2::Integer, 
     β::Integer;
     bound::Integer=1000,
-    cutoff::Real=1e-14,
+    cutoff::Real=1e-7,
     renormalize::Bool=false
 )
     T_r = reshape(T, α * d1, d2 * β)

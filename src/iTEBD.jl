@@ -29,7 +29,7 @@ function itebd2!(
     ΓB::AbstractArray{<:Number, 3},
     λl::AbstractVector{<:Real};
     bound::Integer=100,
-    cutoff::Real=1e-14
+    cutoff::Real=1e-7
 )
     d1, d2 = size(ΓA, 2), size(ΓB, 2)
     ΓA2, λ1, ΓB2 = gate!(mat,  ΓA,  ΓB, λl, d1, d2, bound, cutoff)
@@ -46,7 +46,7 @@ function itebd3!(
     ΓC1::AbstractArray{<:Number, 3},
     λl::AbstractVector{<:Real};
     bound::Integer=100,
-    cutoff::Real=1e-14
+    cutoff::Real=1e-7
 )
     d1, d2, d3 = size(ΓA, 2), size(ΓB, 2),  size(ΓC, 2)
     ΓA2, λ1, ΓBC2 = gate!(mat, ΓAB1, ΓC1, λl, d1, d2 * d3, bound, cutoff)
