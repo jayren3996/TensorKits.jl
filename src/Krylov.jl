@@ -98,7 +98,7 @@ end
 function krylov_arnoldi(K, ρ::Matrix)
     α = size(ρ, 1)
     v0 = reshape(ρ, :)
-    e,v = eigsolve(K, v0, :LR)
+    e,v = eigsolve(K, v0, 1, :LR)
     reshape(v[1], α, α)
 end
 #---------------------------------------------------------------------------------------------------
