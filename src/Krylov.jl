@@ -2,7 +2,7 @@
 # Kraus operator
 #---------------------------------------------------------------------------------------------------
 import LinearAlgebra: mul!
-import Base: *, eltype
+import Base: *, eltype, Array
 export kraus
 struct Kraus{TL, TU}
     KL::Array{TL, 3}
@@ -38,6 +38,9 @@ function *(k::Kraus, ρ0::AbstractVecOrMat)
     ρ
 end
 
+function (k::Kraus)(v::AbstractVector)
+    k * v
+end
 #---------------------------------------------------------------------------------------------------
 # Eigen system using power iteration
 
@@ -45,19 +48,19 @@ end
 # Krylov method ensures Hermicity and semi-positivity.
 #---------------------------------------------------------------------------------------------------
 function complex_iter!(K, ρ1, ρ2)
-    mul!(ρ1, K, ρ2)
     mul!(ρ2, K, ρ1)
-    normalize!(ρ2)
+    mul!(ρ1, K, ρ2)
+    normalize!(ρ1)
 end
 #---------------------------------------------------------------------------------------------------
 function real_iter!(K, ρ1, ρ2)
-    mul!(ρ1, K, ρ2)
     mul!(ρ2, K, ρ1)
-    ρ2 .+= ρ1
-    normalize!(ρ2)
+    mul!(ρ1, K, ρ2)
+    ρ1 .+= ρ2
+    normalize!(ρ1)
 end
 #---------------------------------------------------------------------------------------------------
-function power_iteration(K, ρ1::Matrix, itr::Integer; method::Symbol=:r)
+function power_iteration!(K, ρ1::Matrix, itr::Integer; method::Symbol=:r)
     ρ2 = similar(ρ1)
     if method == :r
         for i = 1:itr
@@ -70,7 +73,7 @@ function power_iteration(K, ρ1::Matrix, itr::Integer; method::Symbol=:r)
     else
         error("Illegal method: $method.")
     end
-    ρ2
+    ρ1
 end
 
 #---------------------------------------------------------------------------------------------------
@@ -84,7 +87,7 @@ function steady_mat(
     Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = Array{eltype(K)}(I(α))
-    power_iteration(kraus, ρ, itr) |> Hermitian
+    power_iteration!(kraus, ρ, itr) |> Hermitian
 end
 #---------------------------------------------------------------------------------------------------
 # Random fixed-point matrix.
@@ -97,5 +100,5 @@ function rand_fixed_mat(
     Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = rand(ComplexF64, α, α) |> Hermitian |> Array
-    power_iteration(kraus, ρ, itr) |> Hermitian
+    power_iteration!(kraus, ρ, itr) |> Hermitian
 end

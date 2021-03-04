@@ -3,6 +3,7 @@ module TensorKits
 using LinearAlgebra
 using SparseArrays
 using TensorOperations
+using KrylovKit
 
 include("Operations.jl")
 include("iTEBD.jl")
