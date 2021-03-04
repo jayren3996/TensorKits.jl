@@ -104,40 +104,40 @@ end
 #---------------------------------------------------------------------------------------------------
 # steady state from identity mat
 function steady_mat(
-    K::Array{<:Number, 3}, 
-    itr::Integer;
+    K::Array{<:Number, 3},
+    itr::Integer=100;
     dir::Symbol=:r
 )
     α = size(K, 3)
     Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = Array{eltype(K)}(I(α))
-    mat = if α < 50
+    mat = if α < 20
         power_iteration!(kraus, ρ, itr) |> Hermitian
     else
         m = krylov_arnoldi(kraus, ρ)
-        if trace(m) < 0.0
+        if real(tr(m)) < 0.0
             m .= -1
         end
         m
     end
-    mat
+    Hermitian(mat)
 end
 #---------------------------------------------------------------------------------------------------
 # Random fixed-point matrix.
 function rand_fixed_mat(
     K::Array{<:Number, 3},
-    itr::Integer;
+    itr::Integer=100;
     dir::Symbol=:r
 )
     α = size(K, 3)
     Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = rand(ComplexF64, α, α) |> Hermitian |> Array
-    mat = if α < 50
+    mat = if α < 20
         power_iteration!(kraus, ρ, itr) |> Hermitian
     else
         krylov_arnoldi(kraus, ρ)
     end
-    mat
+    Hermitian(mat)
 end

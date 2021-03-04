@@ -132,8 +132,7 @@ function schmidt_canonical(
     itr::Integer=100,
     bound::Integer=100,
     cutoff::Real=1e-14,
-    renormalize::Bool=true,
-    ztol::Real=1e-20
+    renormalize::Bool=true
 )
     X, Yt = begin
         R = steady_mat(Γ, itr)
