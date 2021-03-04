@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------------------------------------
 # Kraus operator
 #---------------------------------------------------------------------------------------------------
-import LinearAlgebra: mul!
+import LinearAlgebra: mul!, adjoint
 import Base: *, eltype, Array
 export kraus
 struct Kraus{TL, TU}
@@ -10,8 +10,23 @@ struct Kraus{TL, TU}
     dir::Symbol
 end
 eltype(::Kraus{TL, TU}) where TL where TU = promote_type(TL, TU)
+adjoint(k::Kraus) = k.dir == :r ? Kraus(k.KL, k.KU, :l) : Kraus(k.KL, k.KU, :r)
 kraus(KL, KR; dir::Symbol=:r) = Kraus(Array(KL), Array(KR), dir)
 kraus(KL; dir::Symbol=:r) = Kraus(Array(KL), conj.(KL), dir)
+function Array(k::Kraus)
+    KL, KU, dir = k.KL, k.KU, k.dir
+    α, β = size(KL, 1), size(KU, 1)
+    dim = α * β
+    mat = Matrix{eltype(k)}(undef, dim, dim)
+    if dir == :r
+        mat_r = reshape(mat, α, β, α, β)
+        @tensor mat_r[:] = KL[-1,1,-3] * KU[-2,1,-4]
+    else
+        mat_r = reshape(mat, β, α, β, α)
+        @tensor mat_r[:] = KU[-3,1,-1] * KL[-4,1,-2]
+    end
+    mat
+end
 #---------------------------------------------------------------------------------------------------
 function mul!(ρ::Matrix, k::Kraus, ρ0::AbstractMatrix)
     KL, KU, dir = k.KL, k.KU, k.dir
@@ -38,9 +53,8 @@ function *(k::Kraus, ρ0::AbstractVecOrMat)
     ρ
 end
 
-function (k::Kraus)(v::AbstractVector)
-    k * v
-end
+(k::Kraus)(v::AbstractVector) = k * v
+
 #---------------------------------------------------------------------------------------------------
 # Eigen system using power iteration
 
@@ -77,6 +91,17 @@ function power_iteration!(K, ρ1::Matrix, itr::Integer; method::Symbol=:r)
 end
 
 #---------------------------------------------------------------------------------------------------
+# Eigen system using Arnoldi algorithm
+
+# Ard/noldi method ensures Hermicity but NOT semi-positivity.
+#---------------------------------------------------------------------------------------------------
+function krylov_arnoldi(K, ρ::Matrix)
+    α = size(ρ, 1)
+    v0 = reshape(ρ, :)
+    e,v = eigsolve(K, v0, :LR)
+    reshape(v[1], α, α)
+end
+#---------------------------------------------------------------------------------------------------
 # steady state from identity mat
 function steady_mat(
     K::Array{<:Number, 3}, 
@@ -87,7 +112,16 @@ function steady_mat(
     Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = Array{eltype(K)}(I(α))
-    power_iteration!(kraus, ρ, itr) |> Hermitian
+    mat = if α < 50
+        power_iteration!(kraus, ρ, itr) |> Hermitian
+    else
+        m = krylov_arnoldi(kraus, ρ)
+        if trace(m) < 0.0
+            m .= -1
+        end
+        m
+    end
+    mat
 end
 #---------------------------------------------------------------------------------------------------
 # Random fixed-point matrix.
@@ -100,5 +134,10 @@ function rand_fixed_mat(
     Kc = conj(K)
     kraus = Kraus(K, Kc, dir)
     ρ = rand(ComplexF64, α, α) |> Hermitian |> Array
-    power_iteration!(kraus, ρ, itr) |> Hermitian
+    mat = if α < 50
+        power_iteration!(kraus, ρ, itr) |> Hermitian
+    else
+        krylov_arnoldi(kraus, ρ)
+    end
+    mat
 end
