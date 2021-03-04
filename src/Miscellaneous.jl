@@ -35,7 +35,7 @@ export entropy
 entropy(S::AbstractVector; cutoff::Real=1e-14) = -sum(i*log(i) for i in S if i > cutoff)
 
 export inner_product
-function inner_product(T1::Array, T2::Array; itr::Integer=100)
+function inner_product(T1::Array, T2::Array)
     α, β = size(T1, 3), size(T2, 3)
     K = Kraus(T1, conj(T2), :r)
     ρ = rand(ComplexF64, α, β) |> vec
@@ -43,4 +43,4 @@ function inner_product(T1::Array, T2::Array; itr::Integer=100)
     abs(e[1])
 end
 
-inner_product(T::Array; itr::Integer=100) = inner_product(T, T, itr=itr)
+inner_product(T::Array) = inner_product(T, T)
